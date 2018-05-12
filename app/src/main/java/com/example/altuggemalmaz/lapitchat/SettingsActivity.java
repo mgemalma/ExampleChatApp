@@ -1,6 +1,7 @@
 package com.example.altuggemalmaz.lapitchat;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -14,6 +15,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -24,6 +27,8 @@ public class SettingsActivity extends AppCompatActivity {
 
     //This will be the current FireBase user
     private FirebaseUser mCurrentUser;
+
+    //The storage reference so that the profile images can be stored on the FireBase
 
     //In order to fetch the realtime data on the database we need the UI connections as usual
     private CircleImageView mDisplayImage;
@@ -124,10 +129,52 @@ public class SettingsActivity extends AppCompatActivity {
                 //With this you start the Intent
                 startActivityForResult(Intent.createChooser(galleryIntent,"SELECT IMAGE"),1);
 
+
+                /*
+                // start picker to get image for cropping and then use the image in cropping activity
+                //This is way too easier than using the code above this code is library imported from another repo
+                CropImage.activity()
+                        .setGuidelines(CropImageView.Guidelines.ON)
+                        .start(SettingsActivity.this);
+                */
+
             }
         });
+    }
 
+    //This will run when the image is selected for the user
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
+        //Request Code is the code we passed startActivityForResult
+        if (requestCode == 1 && resultCode == RESULT_OK)
+        {
 
+            //Get the image data from the activity
+            Uri imageUri = data.getData();
+
+            //Pass the image data to this so that the image can be cropped
+            //setAspectRatio will constrain the crop size to be square so that the cropped image
+            //will not get messed up
+            CropImage.activity(imageUri).setAspectRatio(1,1).start(this);
+        }
+
+        //If statement checks that the result that is retrieved is from the CropImageActivity
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+
+            //Over here it gets the photo that is cropped
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+
+            //If the resulting data is ok
+            if (resultCode == RESULT_OK) {
+
+                //Than we get the URI for that data
+                Uri resultUri = result.getUri();
+
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+            }
+        }
     }
 }
