@@ -1,7 +1,10 @@
 package com.example.altuggemalmaz.lapitchat;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,12 +30,20 @@ public class SettingsActivity extends AppCompatActivity {
     private TextView mName;
     private TextView mStatus;
 
+    //The Buttons (Link with the UI)
+    private Button statusBtn;
+    private Button imageBtn;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //This puts the arrow to go back to the view that we set in the AndroidManifest.xml file specificly for this view
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.activity_settings);
+
+        //Initializing The Buttons
+        statusBtn = (Button) findViewById(R.id.settings_status_btn);
+        imageBtn = (Button) findViewById(R.id.settings_image_btn);
 
         //The UI connections has to be established and initialized over here
         mDisplayImage = (CircleImageView) findViewById(R.id.settings_image);
@@ -77,6 +88,46 @@ public class SettingsActivity extends AppCompatActivity {
 
             }
         });
+
+        statusBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //In order to show the status on the status string we send the current status to the
+                //Status view, through the intent we can do that, so we first receieve the status
+                String status = mStatus.getText().toString();
+                Intent status_intent = new Intent(SettingsActivity.this, StatusActivity.class);
+
+                //Over here we are sending the status value to the status activity
+                status_intent.putExtra("status_value",status);
+
+                startActivity(status_intent);
+            }
+        });
+
+
+        //This will get to run when change image button is clicked
+        imageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //This code is to select a image or something
+                //You initialize the intent
+                Intent galleryIntent = new Intent();
+
+                //You select the intent type
+                galleryIntent.setType("image/*");
+
+                //Specify that through this you want to get the content
+                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+
+                //With this you start the Intent
+                startActivityForResult(Intent.createChooser(galleryIntent,"SELECT IMAGE"),1);
+
+            }
+        });
+
+
 
     }
 }
