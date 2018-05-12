@@ -2,12 +2,18 @@ package com.example.altuggemalmaz.lapitchat;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.storage.StorageManager;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -15,6 +21,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -29,6 +39,7 @@ public class SettingsActivity extends AppCompatActivity {
     private FirebaseUser mCurrentUser;
 
     //The storage reference so that the profile images can be stored on the FireBase
+    private StorageReference mImageStorage;
 
     //In order to fetch the realtime data on the database we need the UI connections as usual
     private CircleImageView mDisplayImage;
@@ -55,11 +66,14 @@ public class SettingsActivity extends AppCompatActivity {
         mName = (TextView) findViewById(R.id.settings_display_name);
         mStatus = (TextView) findViewById(R.id.settings_status);
 
+        //Get the storage reference so that the profile images can be saved to the FireBase
+        mImageStorage = FirebaseStorage.getInstance().getReference();
+
         //The current user instance that has been logged in
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         //On the realtime database in order to reach where the data is stored for the specific user, we need the user ID
-        String current_uid = mCurrentUser.getUid();
+        final String current_uid = mCurrentUser.getUid();
 
         //To get to the data of the current user on the database tree we move to the location
         //where the data is stored on real time database
@@ -80,9 +94,13 @@ public class SettingsActivity extends AppCompatActivity {
                 String status = dataSnapshot.child("status").getValue().toString();
                 String thumb_image = dataSnapshot.child("thumb_image").getValue().toString();
 
+                //Location where the file is stored
+                Picasso.with(SettingsActivity.this).load(image).into(mDisplayImage);
+
                 //Now we have the proper real values it's time to add them to the view
                 mName.setText(name);
                 mStatus.setText(status);
+
 
 
             }
@@ -171,6 +189,34 @@ public class SettingsActivity extends AppCompatActivity {
 
                 //Than we get the URI for that data
                 Uri resultUri = result.getUri();
+
+                //According to the id of the user save the user image inside the profile_images directory
+                String uid = mCurrentUser.getUid();
+
+                //Access the location where you are going to save the profile picture
+                StorageReference storage = mImageStorage.child("profile_images").child(uid);
+
+                //Put the file onto the directory and do some tasks when the task is done
+                storage.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                        if (task.isSuccessful())
+                        {
+                            //We will need the download URL to get it later on so we need to store this
+                            String download_url = task.getResult().getDownloadUrl().toString();
+
+                            //Save the image location on the database
+                            mUserDatabase.child("image").setValue(download_url);
+
+                            //To tell the user that this is done
+                            Toast.makeText(SettingsActivity.this, "The image is updated", Toast.LENGTH_LONG).show();
+                        }
+                        else
+                            {
+                                Toast.makeText(SettingsActivity.this, "There was an error!", Toast.LENGTH_LONG).show();
+                            }
+                    }
+                });
 
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
