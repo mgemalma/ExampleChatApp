@@ -21,7 +21,7 @@
 
     <TextView
         android:id="@+id/settings_display_name"
-        android:layout_width="183dp"
+        android:layout_width="324dp"
         android:layout_height="42dp"
         android:layout_centerInParent="true"
         android:text="Display Name"
@@ -31,17 +31,19 @@
 
     <TextView
         android:id="@+id/settings_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="256dp"
+        android:layout_height="43dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="197dp"
+        android:layout_marginBottom="184dp"
         android:text="Hi there, I'm using Lapit Chat App "
-        android:textColor="@android:color/background_light" />
+        android:textAlignment="center"
+        android:textColor="@android:color/background_light"
+        android:textSize="18sp" />
 
     <Button
         android:id="@+id/settings_image_btn"
-        android:layout_width="wrap_content"
+        android:layout_width="141dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
@@ -51,7 +53,7 @@
 
     <Button
         android:id="@+id/settings_status_btn"
-        android:layout_width="wrap_content"
+        android:layout_width="148dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
