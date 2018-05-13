@@ -1,6 +1,7 @@
 package com.example.altuggemalmaz.lapitchat;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.storage.StorageManager;
 import android.provider.Settings;
@@ -28,7 +29,12 @@ import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+
 import de.hdodenhof.circleimageview.CircleImageView;
+import id.zelory.compressor.Compressor;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -94,8 +100,15 @@ public class SettingsActivity extends AppCompatActivity {
                 String status = dataSnapshot.child("status").getValue().toString();
                 String thumb_image = dataSnapshot.child("thumb_image").getValue().toString();
 
-                //Location where the file is stored
-                Picasso.with(SettingsActivity.this).load(image).into(mDisplayImage);
+                //If there is a image that is stored on the Database
+                if (!image.equals("default"))
+                {
+                    //Location where the file is stored
+                    //If you don't want the picture to disappear when it's grabbed from the database
+                    //You can do after load placeholder(R.something) this shows a temporary image to the user while the original picture
+                    //Is received from the database
+                    Picasso.with(SettingsActivity.this).load(image).into(mDisplayImage);
+                }
 
                 //Now we have the proper real values it's time to add them to the view
                 mName.setText(name);
