@@ -1,6 +1,7 @@
 package com.example.altuggemalmaz.lapitchat;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -73,12 +74,31 @@ public class UsersActivity extends AppCompatActivity {
                 return new UserViewHolder(view);
             }
 
+            //Note position variable tells us where the user is tapping the location where the User info is located
             @Override
             protected void onBindViewHolder(UserViewHolder holder, int position, Users model) {
                 // Bind the Chat object to the ChatHolder
                     holder.setName(model.name);
                     holder.setStatus(model.status);
                     holder.setImage(model.image, UsersActivity.this);
+
+                    //User ID of the user so that the user info can be retrieved from the Profile Page
+                    //According to the position this will give us the key the reference String which is the userID
+                    final String user_id = getRef(position).getKey();
+
+                    //When the view is clicked in that case we want to switch the UI
+                    holder.mView.setOnClickListener(new View.OnClickListener() {
+
+                        //When there is a click on according view of users this will get to run
+                        @Override
+                        public void onClick(View v) {
+
+                            Intent profileIntent = new Intent(UsersActivity.this , ProfileActivity.class);
+                            profileIntent.putExtra("user_id", user_id);
+                            startActivity(profileIntent);
+
+                        }
+                    });
             }
 
         };
