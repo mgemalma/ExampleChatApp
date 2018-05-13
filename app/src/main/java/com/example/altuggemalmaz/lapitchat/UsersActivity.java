@@ -1,5 +1,6 @@
 package com.example.altuggemalmaz.lapitchat;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
@@ -49,27 +51,6 @@ public class UsersActivity extends AppCompatActivity {
 
     //Since we want to retrieve the data realtime we have to do this on OnStart Method
 
-    /*@Override
-    protected void onStart() {
-        super.onStart();
-
-
-        //We need to pass the class that we have created for the users View
-        FirebaseRecyclerAdapter<Users , UsersViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Users, UsersViewHolder>(Users.class,
-                R.layout.users_single_layout, UsersViewHolder.class, mUsersDatabase) {
-            @Override
-            protected void onBindViewHolder(@NonNull UsersViewHolder holder, int position, @NonNull Users model) {
-
-            }
-
-            @NonNull
-            @Override
-            public UsersViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                return null;
-            }
-        };
-    }*/
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -95,9 +76,9 @@ public class UsersActivity extends AppCompatActivity {
             @Override
             protected void onBindViewHolder(UserViewHolder holder, int position, Users model) {
                 // Bind the Chat object to the ChatHolder
-                holder.setName(model.name);
-                holder.setStatus(model.status);
-//                holder.setImage(model.image);
+                    holder.setName(model.name);
+                    holder.setStatus(model.status);
+                    holder.setImage(model.image, UsersActivity.this);
             }
 
         };
@@ -125,21 +106,16 @@ public class UsersActivity extends AppCompatActivity {
             statusView.setText(status);
         }
 
-//        public void setImage(String image)
-//        {
-//            CircleImageView mDisplayImage = (CircleImageView) findViewById(R.id.user_single_image);
-//            Picasso.with().load(image).into(mDisplayImage);
-//        }
+        public void setImage(String image, Context ctx)
+        {
+            //If there is no image set for that user we don't want it to be updated
+            if (image.equals("default"))
+                return;
+
+            //If there is a image in that case retrieve the image
+            CircleImageView mDisplayImage = (CircleImageView) mView.findViewById(R.id.user_single_image);
+            Picasso.with(ctx).load(image).into(mDisplayImage);
+        }
     }
 
-
-   /* public class UsersViewHolder extends RecyclerView.ViewHolder
-    {
-
-        public UsersViewHolder(View itemView) {
-            super(itemView);
-        }
-
-
-    }*/
 }
