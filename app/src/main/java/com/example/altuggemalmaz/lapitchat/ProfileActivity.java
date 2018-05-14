@@ -101,6 +101,16 @@ public class ProfileActivity extends AppCompatActivity {
         mProfileSendReqBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
+                /**  Not Friends State (This will only get to run when there is no connection between the users) **/
+                //When the button is clicked we know that the request is already been sent consequently we don't
+                //want the user to click on the button again
+                //The button will only be available if the button changes to cancel friend request
+                //If that is not happening it will disable itself
+
+                mProfileSendReqBtn.setEnabled(false);
+
                 if (mCurrent_state.equals("not_friends"))
                 {
                     //For our requests we send the request so for our side the request_type should be sent
@@ -118,6 +128,11 @@ public class ProfileActivity extends AppCompatActivity {
                                     public void onSuccess(Void aVoid) {
                                         //Show that the sending a friend request is success
                                         Toast.makeText(ProfileActivity.this, "Request Sent!", Toast.LENGTH_SHORT).show();
+
+                                        //Also change the button to be cancel friend request once the request is sent
+                                        mProfileSendReqBtn.setEnabled(true);
+                                        mCurrent_state = "req_sent";
+                                        mProfileSendReqBtn.setText("Cancel Friend Request");
                                     }
                                 });
                             } else
@@ -126,6 +141,32 @@ public class ProfileActivity extends AppCompatActivity {
                                     Toast.makeText(ProfileActivity.this, "Failed sending request!", Toast.LENGTH_SHORT).show();
                                 }
 
+                        }
+                    });
+
+                }
+
+                /** This will get to run when the request is sent by the user basically when the request is sent **/
+                if (mCurrent_state.equals("req_sent"))
+                {
+                    //we are going to clear the database from the request
+                    //First delete the request trace from the current user
+                    mFriendReqDatabase.child(mCurrent_user.getUid()).child(user_id).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+
+                        //When the task is on success we also want to delete it from the other user
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            mFriendReqDatabase.child(user_id).child(mCurrent_user.getUid()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Toast.makeText(ProfileActivity.this, "Request Deleted!", Toast.LENGTH_SHORT).show();
+
+                                    //Also change the button to be cancel friend request once the request is sent
+                                    mProfileSendReqBtn.setEnabled(true);
+                                    mCurrent_state = "not_friends";
+                                    mProfileSendReqBtn.setText("SEND FRIEND REQUEST");
+                                }
+                            });
                         }
                     });
 
