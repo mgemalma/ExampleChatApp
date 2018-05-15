@@ -23,6 +23,7 @@ import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -46,6 +47,9 @@ public class ProfileActivity extends AppCompatActivity {
     //In order to create a term as a friend we are create another database reference
     private DatabaseReference mFriendDatabase;
 
+    //Notification link to the database so that the notifications can be stored on DataBase
+    private DatabaseReference mNotificationDatabase;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +68,7 @@ public class ProfileActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(user_id);
         mFriendReqDatabase = FirebaseDatabase.getInstance().getReference().child("Friend_req");
         mFriendDatabase = FirebaseDatabase.getInstance().getReference().child("Friends");
+        mNotificationDatabase = FirebaseDatabase.getInstance().getReference().child("notifications");
 
         //Get the current users link
         mCurrent_user = FirebaseAuth.getInstance().getCurrentUser();
@@ -231,6 +236,21 @@ public class ProfileActivity extends AppCompatActivity {
                                         mProfileSendReqBtn.setEnabled(true);
                                         mCurrent_state = "req_sent";
                                         mProfileSendReqBtn.setText("Cancel Friend Request");
+
+                                        //To send the database some variables remeber we are sending it with a hashmap
+                                        HashMap<String, String> notificationData = new HashMap<>();
+                                        notificationData.put("from",mCurrent_user.getUid());
+
+                                        //Type of notification
+                                        notificationData.put("type","request");
+
+                                        //Notification Database variable for the other user because when the current user does an action
+                                        //The other guy is suppose to receive the notification consequently we store the notification on that
+                                        //users side
+                                        //The push creates a unique id branch, so everytime a notification occurs
+                                        //The push branch will have a random id consequently everytime for every notification
+                                        //A random id will be generated
+                                        mNotificationDatabase.child(user_id).push().setValue(notificationData);
                                     }
                                 });
                             } else

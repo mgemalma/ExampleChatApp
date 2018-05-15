@@ -27,6 +27,7 @@ dependencies {
     implementation 'com.android.support:support-v4:27.1.1'
     implementation 'com.google.firebase:firebase-database:11.8.0'
     implementation 'com.google.firebase:firebase-storage:11.8.0'
+    implementation 'com.google.firebase:firebase-messaging:11.8.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
@@ -35,6 +36,7 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     implementation 'com.firebaseui:firebase-ui-database:3.2.2'
     compile 'id.zelory:compressor:2.1.0'
+    compile 'com.squareup.okhttp:okhttp:2.5.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

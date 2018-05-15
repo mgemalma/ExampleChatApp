@@ -25,6 +25,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
@@ -85,6 +87,9 @@ public class SettingsActivity extends AppCompatActivity {
         //where the data is stored on real time database
         mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(current_uid);
 
+        //Through this every value we get from this reference will be persisted on the phone through the firebase offline persistence
+        mUserDatabase.keepSynced(true);
+
 
         //This will fetch the data on the database it fetches the data that is stored
         //It gets us something similar like a hashmap
@@ -96,7 +101,7 @@ public class SettingsActivity extends AppCompatActivity {
 
                 //It gets the child area of the data snapshot, it gets its value and turns it into string
                 String name = dataSnapshot.child("name").getValue().toString();
-                String image = dataSnapshot.child("image").getValue().toString();
+                final String image = dataSnapshot.child("image").getValue().toString();
                 String status = dataSnapshot.child("status").getValue().toString();
                 String thumb_image = dataSnapshot.child("thumb_image").getValue().toString();
 
@@ -107,7 +112,20 @@ public class SettingsActivity extends AppCompatActivity {
                     //If you don't want the picture to disappear when it's grabbed from the database
                     //You can do after load placeholder(R.something) this shows a temporary image to the user while the original picture
                     //Is received from the database
-                    Picasso.with(SettingsActivity.this).load(image).into(mDisplayImage);
+                    //Network Policy offline code will do the persistence
+                    //Currently this code is trying to retrieve the image offline
+                    Picasso.with(SettingsActivity.this).load(image).networkPolicy(NetworkPolicy.OFFLINE).into(mDisplayImage, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                             //Do nothing all good
+                        }
+
+                        @Override
+                        public void onError() {
+                            //This means the image is not stored offline so we need to grab it from the database
+                            Picasso.with(SettingsActivity.this).load(image).into(mDisplayImage);
+                        }
+                    });
                 }
 
                 //Now we have the proper real values it's time to add them to the view
