@@ -58,6 +58,24 @@ public class SettingsActivity extends AppCompatActivity {
     private Button statusBtn;
     private Button imageBtn;
 
+    //Database connection for online feature
+    private DatabaseReference mOnlineRef;
+
+    //Online Feature these two functions are guaranteed to be called
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //Set the status to be online
+        mOnlineRef.setValue(true);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //Set the status to be online
+        mOnlineRef.setValue(false);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,6 +108,8 @@ public class SettingsActivity extends AppCompatActivity {
         //Through this every value we get from this reference will be persisted on the phone through the firebase offline persistence
         mUserDatabase.keepSynced(true);
 
+        //Database Link
+        mOnlineRef = FirebaseDatabase.getInstance().getReference().child("Users").child(current_uid).child("online");
 
         //This will fetch the data on the database it fetches the data that is stored
         //It gets us something similar like a hashmap

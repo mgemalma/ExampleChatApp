@@ -283,6 +283,9 @@ public class ProfileActivity extends AppCompatActivity {
                                     mProfileSendReqBtn.setEnabled(true);
                                     mCurrent_state = "not_friends";
                                     mProfileSendReqBtn.setText("SEND FRIEND REQUEST");
+
+                                    //clear the notification
+                                    mNotificationDatabase.child(user_id).removeValue();
                                 }
                             });
                         }
@@ -301,14 +304,14 @@ public class ProfileActivity extends AppCompatActivity {
                     final String currentDate = DateFormat.getDateTimeInstance().format(new Date());
 
                     //Now this entry should be added to the database because we are saving the value and adding the user as a friend
-                    mFriendDatabase.child(mCurrent_user.getUid()).child(user_id).setValue(currentDate).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    mFriendDatabase.child(mCurrent_user.getUid()).child(user_id).child("date").setValue(currentDate).addOnSuccessListener(new OnSuccessListener<Void>() {
 
                          //We also need to update the other users friends database
                         @Override
                         public void onSuccess(Void aVoid) {
 
                             //Friend is being updated on the database reciprocally
-                            mFriendDatabase.child(user_id).child(mCurrent_user.getUid()).setValue(currentDate).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            mFriendDatabase.child(user_id).child(mCurrent_user.getUid()).child("date").setValue(currentDate).addOnSuccessListener(new OnSuccessListener<Void>() {
 
                                 //When the all database updating is done
                                 @Override
@@ -332,6 +335,9 @@ public class ProfileActivity extends AppCompatActivity {
 
                                                     //Hide this button since it won't be needed anymore we accepted the request
                                                     mProfileCancelReq.setVisibility(View.GONE);
+
+                                                    //clear the notification
+                                                    mNotificationDatabase.child(mCurrent_user.getUid()).removeValue();
                                                 }
                                             });
                                         }

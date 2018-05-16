@@ -9,10 +9,13 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
+import android.widget.Toast;
 import android.widget.Toolbar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -25,6 +28,35 @@ public class MainActivity extends AppCompatActivity{
     private ViewPager mViewPager;
     private SectionsPageAdapter mSectionsPagerAdapter;
     private TabLayout mTabLayout;
+
+    //Database connection for online feature
+    private DatabaseReference mOnlineRef;
+
+    //Online Feature
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        if (currentUser == null)
+        {
+            //Sends the view to the start activity
+            sendtostart();
+        } else
+        {
+            //Set the status to be online
+            mOnlineRef.setValue(true);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        //Set the status to be offline
+        mOnlineRef.setValue(false);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +84,10 @@ public class MainActivity extends AppCompatActivity{
         mTabLayout = (TabLayout) findViewById(R.id.main_tabs);
         mTabLayout.setupWithViewPager(mViewPager);
 
+        //Database Link
+        mOnlineRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getUid()).child("online");
+
+
     }
 
     //When the main activity view is on this code will run first
@@ -60,11 +96,16 @@ public class MainActivity extends AppCompatActivity{
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
+
         if (currentUser == null)
         {
             //Sends the view to the start activity
             sendtostart();
-        }
+        } else
+            {
+                //Set the status to be online
+                mOnlineRef.setValue(true);
+            }
     }
 
     private void sendtostart() {
