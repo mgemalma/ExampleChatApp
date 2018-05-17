@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity{
         super.onPause();
 
         //Set the status to be offline
+        if(mAuth.getCurrentUser() != null)
         mOnlineRef.setValue(false);
     }
 
@@ -85,6 +86,7 @@ public class MainActivity extends AppCompatActivity{
         mTabLayout.setupWithViewPager(mViewPager);
 
         //Database Link
+        if (mAuth.getCurrentUser() != null)
         mOnlineRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getUid()).child("online");
 
 

@@ -66,6 +66,8 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         //Set the status to be online
+
+        if (mCurrentUser != null)
         mOnlineRef.setValue(true);
     }
 
@@ -73,6 +75,7 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         //Set the status to be online
+        if (mCurrentUser != null)
         mOnlineRef.setValue(false);
     }
 
