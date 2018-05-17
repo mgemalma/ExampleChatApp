@@ -1,7 +1,10 @@
  package com.example.altuggemalmaz.lapitchat;
 
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -95,7 +98,7 @@ public class FriendsFragment extends Fragment {
                     holder.setDate(model.getDate());
 
                     //From the fireBase UI since we are accesing the data through the userid we can get it through
-                    String list_user_id = getRef(position).getKey();
+                    final String list_user_id = getRef(position).getKey();
 
                     System.out.print(list_user_id);
 
@@ -120,6 +123,50 @@ public class FriendsFragment extends Fragment {
 
                                 }
                             });
+
+                    //Set the onclick listener for the friends tab so that when the user clicks one of the user tabs
+                    //the more detailed view can appear
+                    holder.mView.setOnClickListener(new View.OnClickListener() {
+
+                        //For this one will show an alert dialog
+                        @Override
+                        public void onClick(View v) {
+
+                            CharSequence options[] = new CharSequence[]{"Open Profile" , "Send Message"};
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+                            builder.setTitle("Select Options");
+                            builder.setItems(options, new DialogInterface.OnClickListener() {
+
+                                //This will tell us which option on alert dialog is selected
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                    //If Open Profile Option is selected then
+                                    if (which == 0)
+                                    {
+                                        //Send the view to the profile of that user
+                                        Intent profileIntent = new Intent(getContext(), ProfileActivity.class);
+                                        profileIntent.putExtra("user_id", list_user_id);
+                                        startActivity(profileIntent);
+                                    }
+
+
+                                    //If send a message feature is clicked
+                                    if (which == 1)
+                                    {
+
+                                        //Then switch the view to the ChatActivity
+                                        Intent chatIntent = new Intent(getContext(),ChatActivity.class);
+                                        chatIntent.putExtra("user_id", list_user_id);
+                                        startActivity(chatIntent);
+                                    }
+                                }
+                            });
+
+                            builder.show();
+                        }
+                    });
 
                 }
 

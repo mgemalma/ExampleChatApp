@@ -16,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -56,7 +57,13 @@ public class MainActivity extends AppCompatActivity{
 
         //Set the status to be offline
         if(mAuth.getCurrentUser() != null)
-        mOnlineRef.setValue(false);
+        {
+            mOnlineRef.setValue(false);
+
+            //Also update the last seen variable
+            //FireBase server timeStamp is sent to the server
+            FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid()).child("lastSeen").setValue(ServerValue.TIMESTAMP);
+        }
     }
 
     @Override
