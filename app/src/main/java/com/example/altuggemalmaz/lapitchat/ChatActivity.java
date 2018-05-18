@@ -211,7 +211,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void loadMessages()
     {
-        
+
         //The reference to the DB where the messages are stored
         //We are going to use Child Event Listener to deal with multiple things and load all the messages
         mRootRef.child("messages").child(mCurrentUser).child(mChatUser).addChildEventListener(new ChildEventListener() {
