@@ -5,20 +5,21 @@ public class Messages {
     private String message, type;
     private long  time;
     private boolean seen;
+    private String from;
 
-//   // private String from;
-//
-//    public Messages(String from) {
-//        this.from = from;
-//    }
-//
-//    public String getFrom() {
-//        return from;
-//    }
-//
-//    public void setFrom(String from) {
-//        this.from = from;
-//    }
+   // private String from;
+
+    public Messages(String from) {
+        this.from = from;
+    }
+
+    public String getFrom() {
+        return from;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
+    }
 
     public Messages(String message, String type, long time, boolean seen) {
         this.message = message;

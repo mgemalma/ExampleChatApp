@@ -145,6 +145,14 @@ public class MainActivity extends AppCompatActivity{
         //According to which item is clicked
         if (item.getItemId() == R.id.main_logout_btn)
         {
+            // Check if user is signed in (non-null) and update UI accordingly.
+            FirebaseUser currentUser = mAuth.getCurrentUser();
+
+            //Also make sure that the user remains offline when logs out
+            if (currentUser != null)
+            {
+                mOnlineRef.setValue(false);
+            }
             FirebaseAuth.getInstance().signOut();
             sendtostart();
         }

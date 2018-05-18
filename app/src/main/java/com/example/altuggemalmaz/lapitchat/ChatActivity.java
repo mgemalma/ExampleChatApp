@@ -2,6 +2,7 @@ package com.example.altuggemalmaz.lapitchat;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -10,10 +11,12 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -22,7 +25,9 @@ import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ChatActivity extends AppCompatActivity {
@@ -57,6 +62,18 @@ public class ChatActivity extends AppCompatActivity {
     //The link to the recyclerView for messages
     private RecyclerView mMessagesList;
 
+    //The List of messages that we will be storing in a list
+    private final List<Messages> messagesList = new ArrayList<>();
+    private LinearLayoutManager mLinearLayout;
+
+    //The Adapter Class that we created for the messages, basically takes the message from the messages list and puts it into the
+    //UI for the messages that we have created
+
+    private MessageAdapter mAdapter;
+
+    //The Database reference to the messages part of the dataBase
+    private DatabaseReference mMessageDatabase;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,13 +94,29 @@ public class ChatActivity extends AppCompatActivity {
         mChatAddBtn = (ImageButton) findViewById(R.id.chat_add_btn);
         mChatSendBtn = (ImageButton) findViewById(R.id.chat_send_btn);
         mChatMessageView = (EditText) findViewById(R.id.chat_message_view);
+
+       //Initialize the Adapter for the message list
+        mAdapter = new MessageAdapter(messagesList);
+
         mMessagesList = (RecyclerView) findViewById(R.id.chat_messages_list);
 
+        //Initialize the Linear Layout Manager
+        mLinearLayout = new LinearLayoutManager(this);
+        mMessagesList.setHasFixedSize(true);
+
+        //Set the layout Manager
+        mMessagesList.setLayoutManager(mLinearLayout);
+
+        //Set the Adapter for the messages view
+        mMessagesList.setAdapter(mAdapter);
 
         //Get the current user id who is using this app
         mRootRef = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance().getCurrentUser();
         mCurrentUser = mAuth.getUid();
+
+        //load the messages on the database for the current user
+        loadMessages();
 
         //Get the name of the user
         mUserDatabase.addValueEventListener(new ValueEventListener() {
@@ -176,6 +209,48 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
+    private void loadMessages()
+    {
+        //The reference to the DB where the messages are stored
+        //We are going to use Child Event Listener to deal with multiple things and load all the messages
+        mRootRef.child("messages").child(mCurrentUser).child(mChatUser).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+                //Through this we make the database value to be linked with the model class
+                Messages message = dataSnapshot.getValue(Messages.class);
+
+                //Add the recieved message chunk into the list that we have created
+                messagesList.add(message);
+
+                //So the adapter can update it's own list version remember it has a list in it of its own
+                mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+    }
+
     private void sendMessage() {
 
         //Get the text in the EditText
@@ -205,12 +280,16 @@ public class ChatActivity extends AppCompatActivity {
             messageMap.put("seen", false);
             messageMap.put("type", "text");
             messageMap.put("time", ServerValue.TIMESTAMP);
+            messageMap.put("from", mCurrentUser);
 
             Map messageUserMap = new HashMap();
 
             //Now push the message content according to the unqiue message id
             messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
             messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
+
+            //Before sending the text finally erase the text that is in the input bar
+            mChatMessageView.setText("");
 
             //Finally send the message contents into the DataBase
             mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {

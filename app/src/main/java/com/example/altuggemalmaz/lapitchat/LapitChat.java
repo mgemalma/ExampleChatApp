@@ -36,16 +36,16 @@ public class LapitChat extends Application {
         built.setLoggingEnabled(true);
         Picasso.setSingletonInstance(built);
 
-        mAuth = FirebaseAuth.getInstance();
-
-        /*if (mAuth.getCurrentUser() != null)
-        {
-
-
-            mUserDatabase = FirebaseDatabase.getInstance().getReference().child(mAuth.getCurrentUser().getUid());
-
-            mUserDatabase.child("online").onDisconnect().setValue(false);
-        }*/
+//        mAuth = FirebaseAuth.getInstance();
+//
+//        if (mAuth.getCurrentUser() != null)
+//        {
+//
+//
+//            mUserDatabase = FirebaseDatabase.getInstance().getReference().child(mAuth.getCurrentUser().getUid());
+//
+//            mUserDatabase.child("online").onDisconnect().setValue(false);
+//        }
 
     }
 }
