@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
@@ -30,6 +31,9 @@ public class UsersActivity extends AppCompatActivity {
     //To connect to the Database
     private DatabaseReference  mUsersDatabase;
 
+    //The Current User
+    private FirebaseUser mCurUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +47,7 @@ public class UsersActivity extends AppCompatActivity {
 
         //Since we want to get the values in the Users we want to make the Database reference point to that particular section
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
+        mCurUser = FirebaseAuth.getInstance().getCurrentUser();
 
         mUsersList.setHasFixedSize(true);
         mUsersList.setLayoutManager(new LinearLayoutManager(this));
