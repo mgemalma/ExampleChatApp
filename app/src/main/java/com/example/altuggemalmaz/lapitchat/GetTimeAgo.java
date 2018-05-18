@@ -27,14 +27,14 @@ public class GetTimeAgo extends Application {
     private static final int DAY_MILLIS = 24 * HOUR_MILLIS;
 
 
-    public static String getTimeAgo(long time, Context ctx) {
+    public static String getTimeAgo(long time) {
         if (time < 1000000000000L) {
             // if timestamp given in seconds, convert to millis
             time *= 1000;
         }
 
         long now = System.currentTimeMillis();
-        if (time > now || time <= 0) {
+        if (time > now || time < 0) {
             return null;
         }
 

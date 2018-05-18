@@ -12,18 +12,38 @@
         android:src="@android:drawable/sym_def_app_icon" />
 
     <TextView
-        android:id="@+id/message_text_layout"
+        android:id="@+id/message_display_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="74dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/message_text_backgroud"
-        android:padding="10dp"
-        android:text="TextView"
+        android:layout_marginStart="70dp"
+        android:layout_marginTop="2dp"
+        android:text="Display Name"
+        android:textColor="@android:color/background_dark"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/message_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="70dp"
+        android:layout_marginTop="30dp"
+        android:text="Message Text"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/message_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/message_profile_layout"
+        android:layout_toEndOf="@+id/message_display_name"
+        android:padding="5dp"
+        android:text="00:00"
         android:textAlignment="center"
-        android:textColor="@android:color/background_light"
-        android:textSize="14sp" />
+        android:textSize="16sp" />
 
 </RelativeLayout>

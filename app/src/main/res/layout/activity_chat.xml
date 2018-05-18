@@ -7,12 +7,21 @@
     android:background="@android:color/darker_gray"
     tools:context=".ChatActivity">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/chat_messages_list"
-        android:layout_width="match_parent"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/message_swipe_layout"
+        android:layout_width="wrap_content"
         android:layout_height="394dp"
         android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"></android.support.v7.widget.RecyclerView>
+        android:layout_centerVertical="true">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/chat_messages_list"
+            android:layout_width="match_parent"
+            android:layout_height="394dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"></android.support.v7.widget.RecyclerView>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
 
     <android.support.v7.widget.Toolbar
 
@@ -54,8 +63,9 @@
         android:id="@+id/chat_last_seen"
         android:layout_width="209dp"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/chat_app_bar"
+        android:layout_alignBottom="@+id/chat_bar_image"
         android:layout_alignStart="@+id/chat_display_name"
+        android:layout_marginStart="1dp"
         android:text="Last Seen"
         android:textColor="@android:color/background_light" />
 
