@@ -46,4 +46,13 @@
         android:textAlignment="center"
         android:textSize="16sp" />
 
+    <ImageView
+        android:id="@+id/message_image_layout"
+        android:layout_width="255dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/message_profile_layout"
+        android:layout_marginEnd="37dp"
+        android:scaleType="centerCrop" />
+
 </RelativeLayout>

@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -16,6 +17,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -48,6 +51,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             public TextView displayName;
             public TextView messageTime;
             public CircleImageView profileImage;
+            public ImageView messageImage;
 
             //Initializes the links to the UI links
             public MessageViewHolder(View view)
@@ -57,6 +61,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 profileImage = (CircleImageView) view.findViewById(R.id.message_profile_layout);
                 displayName = (TextView) view.findViewById(R.id.message_display_name);
                 messageTime = (TextView) view.findViewById(R.id.message_time);
+                messageImage = (ImageView) view.findViewById(R.id.message_image_layout);
 
             }
     }
@@ -81,10 +86,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         String current_user_id = mAuth.getCurrentUser().getUid();
 
         //Get the selected message from the list
-        Messages c = mMessageList.get(i);
+        final Messages c = mMessageList.get(i);
 
         //Get the info of who send the message
         String from_user = c.getFrom();
+
+        //Get the type of the message if its image or not
+        String message_type = c.getType();
 
         //Connect to the Database
         rootRef = FirebaseDatabase.getInstance().getReference().child("Users").child(from_user);
@@ -118,13 +126,44 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             }
         });
 
+        if (message_type.equals("text"))
+        {
+            //Set the message to the view for the single text
+            viewHolder.messageText.setText(c.getMessage());
+
+            //Make the image part disappear
+            viewHolder.messageImage.setVisibility(View.INVISIBLE);
+        }
+        else
+            {
+                //If image make the text part invisible
+                viewHolder.messageText.setVisibility(View.INVISIBLE);
+                //Location where the file is stored
+                //If you don't want the picture to disappear when it's grabbed from the database
+                //You can do after load placeholder(R.something) this shows a temporary image to the user while the original picture
+                //Is received from the database
+                //Network Policy offline code will do the persistence
+                //Currently this code is trying to retrieve the image offline
+                Picasso.with(viewHolder.itemView.getContext()).load(c.getMessage()).networkPolicy(NetworkPolicy.OFFLINE).into(viewHolder.messageImage, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        //Do nothing all good
+                    }
+
+                    @Override
+                    public void onError() {
+                        //This means the image is not stored offline so we need to grab it from the database
+                        Picasso.with(viewHolder.itemView.getContext()).load(c.getMessage()).into(viewHolder.messageImage);
+                    }
+                });
+            }
+
         //Update the time of the text
         long time = c.getTime();
         String timeString = GetTimeAgo.getTimeAgo(time);
         viewHolder.messageTime.setText(timeString);
 
-        //Set the message to the view for the single text
-        viewHolder.messageText.setText(c.getMessage());
+
     }
 
 
