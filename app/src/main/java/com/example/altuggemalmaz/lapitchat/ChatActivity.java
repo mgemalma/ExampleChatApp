@@ -14,6 +14,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -28,6 +29,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,6 +84,13 @@ public class ChatActivity extends AppCompatActivity {
 
     //Swipe refresh layout for the page so that it fetches more content from the DataBase
     private SwipeRefreshLayout mRefreshLayout;
+
+    //Solution to get the messages in proper order we are recording the positions to place
+    private int itemPos = 0;
+
+    //The last key to store is needed so that it can be picked up where it left of
+    private String lastKey = "";
+    private  String prevKey = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -213,6 +222,7 @@ public class ChatActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //We don't do anything here because when the user even hits enter we want to send the message
                 //That is why we leave it to the function to take care
+
                 sendMessage();
             }
         });
@@ -225,10 +235,103 @@ public class ChatActivity extends AppCompatActivity {
                 //When the user refreshes page to get more content increase the page size
                 mCurrentPage++;
 
-                //And then call the load messages again
-                loadMessages();
+                //Clear the listview so that the data doesn't keep acumulate even the same content
+                //loaded again and again
+                //messagesList.clear();
+
+                itemPos = 0;
+                //And then call the load messages again in order to
+                loadMoreMessages();
+
             }
         });
+
+    }
+
+    private void loadMoreMessages() {
+
+        //Database reference where the messages are stored
+        DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUser).child(mChatUser);
+
+        //Load 10 messages for now
+        //As the refresh is triggered the "page" will increase consequently getting more multiples of items to load
+        //Limit to last will get it the last "number" value
+        Query messageQuery = messageRef.orderByKey().endAt(lastKey).limitToLast(10);
+
+        //The reference to the DB where the messages are stored
+        //We are going to use Child Event Listener to deal with multiple things and load all the messages
+        messageQuery.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+                //Through this we make the database value to be linked with the model class
+                Messages message = dataSnapshot.getValue(Messages.class);
+
+                if(!prevKey.equals(dataSnapshot.getKey())){
+
+                    //Add the recieved message chunk into the list that we have created
+                    messagesList.add(itemPos++, message);
+
+                } else {
+
+                    //If we are about to take the previous one we already put it (this will be the last value) just skip it
+                    //And update it's value to be previous one 
+                    prevKey = lastKey;
+
+                }
+
+
+                //Increment the position of the message
+                //itempPos is one in that case its the first element save the key of the value in the first position
+                //if (itemPos == 0)
+                if ( itemPos == 1)
+                {
+                    //Store the key of the first message
+                    lastKey = dataSnapshot.getKey();
+                }
+
+                //So that the message that ended in the previous page is not copied onto this one again
+                //And there are no double messges last one will be the one we are getting the last key which is at 0 index previous one
+                //Just skip that one
+               /* if (itemPos == 9)
+                {
+                    return;
+                }*/
+
+                //So the adapter can update it's own list version remember it has a list in it of its own
+                mAdapter.notifyDataSetChanged();
+
+                //This always makes the view to point to the last item that was send
+                //mMessagesList.scrollToPosition(messagesList.size() - 1);
+
+                //Get rid of the spinning refresh button since it's task is done
+                mRefreshLayout.setRefreshing(false);
+
+                //So that it doesn't scroll to the very bottom again
+                mLinearLayout.scrollToPositionWithOffset(10, 0);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
 
     }
 
@@ -239,6 +342,7 @@ public class ChatActivity extends AppCompatActivity {
 
         //Load 10 messages for now
         //As the refresh is triggered the "page" will increase consequently getting more multiples of items to load
+        //Limit to last will get it the last "number" value
         Query messageQuery = messageRef.limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD);
 
         //The reference to the DB where the messages are stored
@@ -250,6 +354,16 @@ public class ChatActivity extends AppCompatActivity {
                 //Through this we make the database value to be linked with the model class
                 Messages message = dataSnapshot.getValue(Messages.class);
 
+                //Increment the position of the message
+                //itempPos is one in that case its the first element save the key of the value in the first position
+
+                if (++itemPos == 1)
+                {
+                    //Store the key of the first message
+                    lastKey = dataSnapshot.getKey();
+                    prevKey = dataSnapshot.getKey();
+                }
+
                 //Add the recieved message chunk into the list that we have created
                 messagesList.add(message);
 
@@ -258,6 +372,11 @@ public class ChatActivity extends AppCompatActivity {
 
                 //This always makes the view to point to the last item that was send
                 mMessagesList.scrollToPosition(messagesList.size() - 1);
+
+                //Get rid of the spinning refresh button since it's task is done
+                mRefreshLayout.setRefreshing(false);
+
+                //mLinearLayout.scrollToPositionWithOffset(10, 0);
             }
 
             @Override
