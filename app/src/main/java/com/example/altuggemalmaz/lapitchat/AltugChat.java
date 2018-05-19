@@ -12,7 +12,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 
-public class LapitChat extends Application {
+public class AltugChat extends Application {
 
     //For online feature
     //Database links

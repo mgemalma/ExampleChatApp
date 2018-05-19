@@ -1,5 +1,6 @@
 package com.example.altuggemalmaz.lapitchat;
 
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,6 +22,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
@@ -74,6 +76,13 @@ public class ChatActivity extends AppCompatActivity {
     //The Database reference to the messages part of the dataBase
     private DatabaseReference mMessageDatabase;
 
+    //Total number of items to load from the DataBase to the chatPage
+    private static final int TOTAL_ITEMS_TO_LOAD = 10;
+    private int mCurrentPage = 1;
+
+    //Swipe refresh layout for the page so that it fetches more content from the DataBase
+    private SwipeRefreshLayout mRefreshLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +103,7 @@ public class ChatActivity extends AppCompatActivity {
         mChatAddBtn = (ImageButton) findViewById(R.id.chat_add_btn);
         mChatSendBtn = (ImageButton) findViewById(R.id.chat_send_btn);
         mChatMessageView = (EditText) findViewById(R.id.chat_message_view);
+        mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.message_swipe_layout);
 
        //Initialize the Adapter for the message list
         mAdapter = new MessageAdapter(messagesList);
@@ -207,14 +217,33 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
+        //Set the listener for the activation of the refresh button
+        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+                //When the user refreshes page to get more content increase the page size
+                mCurrentPage++;
+
+                //And then call the load messages again
+                loadMessages();
+            }
+        });
+
     }
 
     private void loadMessages()
     {
+        //Database reference where the messages are stored
+        DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUser).child(mChatUser);
+
+        //Load 10 messages for now
+        //As the refresh is triggered the "page" will increase consequently getting more multiples of items to load
+        Query messageQuery = messageRef.limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD);
 
         //The reference to the DB where the messages are stored
         //We are going to use Child Event Listener to deal with multiple things and load all the messages
-        mRootRef.child("messages").child(mCurrentUser).child(mChatUser).addChildEventListener(new ChildEventListener() {
+        messageQuery.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
@@ -226,6 +255,9 @@ public class ChatActivity extends AppCompatActivity {
 
                 //So the adapter can update it's own list version remember it has a list in it of its own
                 mAdapter.notifyDataSetChanged();
+
+                //This always makes the view to point to the last item that was send
+                mMessagesList.scrollToPosition(messagesList.size() - 1);
             }
 
             @Override
