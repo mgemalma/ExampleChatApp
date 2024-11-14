@@ -1,27 +1,27 @@
 # Lapit Chat - Android SDK Chat App
 
-Lapit Chat is a chat application developed using Android SDK and Firebase, based on the [YouTube tutorial series by TVAC Studios](https://www.youtube.com/playlist?list=PLGCjwl1RrtcQ3o2jmZtwu2wXEA4OIIq53). The tutorial series provided the foundational structure for building a Firebase-powered chat app, which I followed closely. I've also added comments throughout the code to clarify various sections and enhance learning.
+Lapit Chat is a chat application built using Android SDK and Firebase, following the [YouTube tutorial series by TVAC Studios](https://www.youtube.com/playlist?list=PLGCjwl1RrtcQ3o2jmZtwu2wXEA4OIIq53). The tutorial provided the core structure and functionality, and I implemented minor tweaks to enhance certain features and usability.
 
 ## Features
 
 - Real-time messaging
-- Firebase authentication and database
+- Firebase authentication and database integration
 - Profile customization
 - Push notifications
-- And more...
 
 ## Getting Started
 
-To get started with Lapit Chat, clone this repository and open it in Android Studio. Follow the instructions within the code comments to set up Firebase and any other dependencies.
+To set up Lapit Chat, clone this repository and open it in Android Studio. Refer to the code comments for guidance on Firebase setup and any other necessary configurations.
 
 ## Acknowledgements
 
-This project is based on tutorials from [TVAC Studios](https://www.youtube.com/playlist?list=PLGCjwl1RrtcQ3o2jmZtwu2wXEA4OIIq53), which offered a comprehensive guide to building an Android chat app with Firebase.
+Thanks to [TVAC Studios](https://www.youtube.com/playlist?list=PLGCjwl1RrtcQ3o2jmZtwu2wXEA4OIIq53) for the original tutorial series that served as the foundation for this app.
 
 ## My Contribution
 
-Beyond following the tutorial, I’ve added comments throughout the code to support other developers in understanding the app’s functionality and Firebase integration.
+While the app closely follows the tutorial, I’ve made minor tweaks to improve functionality and ease of use.
 
 ## License
 
-This project is for educational purposes only and should not be redistributed under an open-source license without permission from TVAC Studios, as the code is closely based on their tutorial series.
+This project is for educational purposes only and should not be redistributed under an open-source license without permission from TVAC Studios, as the code is based on their tutorial series.
+
